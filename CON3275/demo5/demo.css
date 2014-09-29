@@ -1,0 +1,19 @@
+.breadcrumb-bar {
+    -fx-padding: 0;
+    -fx-spacing: -1;
+}
+.breadcrumb-bar > .button {
+    -fx-background-insets: 0 1 0 0;
+    -fx-border-image-source: url("images/crumb.png");
+    -fx-border-image-slice: 1 10 1 0 fill;
+    -fx-border-image-width: 1 10 1 0;
+    -fx-border-image-repeat: stretch;
+}
+
+.breadcrumb-bar > .button:only-child,
+.breadcrumb-bar > .button:last-child {
+    -fx-border-image-slice: 0 0 0 0;
+}
+
+.breadcrumb-bar > .button:first-child {
+}
