@@ -1,4 +1,26 @@
-package CON3275.demo2;
+/* The MIT License (MIT)
+ *
+ * Copyright (c) 2014 David S. Grieve
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+package con3275.demo1;
 
 import javafx.css.CssMetaData;
 import javafx.css.ParsedValue;
@@ -8,7 +30,6 @@ import javafx.css.Styleable;
 import javafx.css.StyleableObjectProperty;
 import javafx.css.StyleableProperty;
 import javafx.scene.control.Button;
-import javafx.scene.effect.BoxBlur;
 import javafx.scene.effect.Effect;
 import javafx.scene.effect.Reflection;
 import javafx.scene.text.Font;
@@ -23,7 +44,7 @@ public class MyButton extends Button {
         super(text);
     }
 
-    private StyleableObjectProperty<Effect> effect = new SimpleStyleableObjectProperty<Effect>(EFFECT) {
+    private StyleableProperty<Effect> effect = new SimpleStyleableObjectProperty<Effect>(EFFECT) {
         @Override
         protected void invalidated() {
             setEffect(get());
@@ -37,61 +58,24 @@ public class MyButton extends Button {
         public Effect convert(ParsedValue<String, Effect> value, Font font) {
 
             String string = value.getValue();
-
-
-            String[] effectStrings = string.split("\\|");
-
             Effect effect = null;
 
-            for (int n=0; n<effectStrings.length; n++) {
-
-                String effectString = effectStrings[n].trim();
-
-                if ("reflection(".regionMatches(true, 0, effectString, 0, "reflection(".length())) {
-                    String s = effectString.substring("reflection(".length(), effectString.lastIndexOf(')'));
-                    String[] args = s.split(",");
-                    double offset = toDouble(args[0], 0d);
-                    double fraction = toDouble(args[1], 1d);
-                    double topOpacity = toDouble(args[2], 1d);
-                    double bottomOpacity = toDouble(args[3], 0d);
-                    Effect reflection = new Reflection(offset, fraction, topOpacity, bottomOpacity);
-                    if (effect != null) {
-                        ((BoxBlur) effect).setInput(reflection);
-                    } else {
-                        effect = reflection;
-                    }
-                } else if ("box-blur(".regionMatches(true, 0, effectString, 0, "box-blur(".length())) {
-                    String s = effectString.substring("box-blur(".length(), effectString.lastIndexOf(')'));
-                    String[] args = s.split(",");
-
-                    double width = toDouble(args[0], 3d);
-                    double height = toDouble(args[1], 3d);
-                    int iterations = toInteger(args[2], 1);
-                    Effect boxBlur = new BoxBlur(width, height, iterations);
-                    if (effect != null) {
-                        ((Reflection) effect).setInput(boxBlur);
-                    } else {
-                        effect = boxBlur;
-                    }
-                }
+            if("reflection(".regionMatches(true,0,string,0,"reflection(".length())) {
+                String s = string.substring("reflection(".length(), string.lastIndexOf(')'));
+                String[] args = s.split(",");
+                double offset = valueOf(args[0], 0d);
+                double fraction = valueOf(args[1], 1d);
+                double topOpacity = valueOf(args[2], 1d);
+                double bottomOpacity = valueOf(args[3], 0d);
+                effect = new Reflection(offset, fraction, topOpacity, bottomOpacity);
             }
-
             return effect;
         }
 
-        private double toDouble(String s, double def) {
+        private double valueOf(String s, double def) {
             try {
                 Double d = Double.valueOf(s);
                 return d.doubleValue();
-            } catch (NumberFormatException nfe) {
-                return def;
-            }
-        }
-
-        private int toInteger(String s, int def) {
-            try {
-                Integer i = Integer.valueOf(s);
-                return i.intValue();
             } catch (NumberFormatException nfe) {
                 return def;
             }
